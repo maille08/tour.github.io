@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LES ÉCHECS </title>
+    <style>
+        :root {
+            --neon-blue: #00f2ff;
+            --neon-pink: #ff007b;
+            --gold: #f4ea11;
+            --dark: #0a0a0a;
+            --card-bg: #16161a;
+        }
+
+        body {
+            font-family: 'Segoe UI', Impact, sans-serif;
+            background-color: var(--dark);
+            color: white;
+            margin: 0;
+            scroll-behavior: smooth;
+        }
+
+        /* Barre de Trophées Fixe */
+        .trophy-bar {
+            background: rgba(0,0,0,0.95);
+            padding: 10px;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            border-bottom: 2px solid var(--neon-blue);
+        }
+
+        .t-icon { font-size: 1.5rem; opacity: 0.1; transition: 0.3s; filter: grayscale(1); }
+        .unlocked { opacity: 1; filter: grayscale(0); transform: scale(1.2); text-shadow: 0 0 10px white; }
+
+        /* Navigation */
+        nav {
+            margin-top: 70px;
+            background: #111;
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-nav {
+            background: #222;
+            color: white;
+            border: 1px solid var(--neon-blue);
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .btn-nav:hover { background: var(--neon-blue); color: black; box-shadow: 0 0 15px var(--neon-blue); }
+
+        .container { width: 90%; max-width: 1100px; margin: auto; padding: 20px; }
+
+        .page { display: none; animation: fadeIn 0.5s; }
+        .active { display: block; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Cartes */
+        .piece-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        .piece-card {
+            background: var(--card-bg);
+            border: 2px solid #333;
+            border-radius: 20px;
+            padding: 25px;
+            text-align: center;
+            transition: 0.3s;
+            margin-bottom: 20px;
+        }
+        .piece-card:hover { border-color: var(--neon-pink); }
+        
+        .big-emoji { font-size: 4rem; display: block; margin-bottom: 10px; }
+        .valeur { color: var(--gold); font-weight: bold; font-size: 1.3rem; display: block; margin-bottom: 10px; }
+        
+        .move-box {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+            font-size: 0.95rem;
+            border-left: 4px solid var(--neon-blue);
+            text-align: left;
+        }
+
+        /* Quiz */
+        .quiz-container {
+            background: #1a1a1a;
+            padding: 30px;
+            border-radius: 20px;
+            border: 2px solid var(--neon-pink);
+            text-align: center;
+        }
+        .answer-btn {
+            background: #333; color: white; border: 2px solid var(--neon-blue);
+            padding: 15px; margin: 10px; width: 100%; max-width: 400px;
+            border-radius: 10px; cursor: pointer; font-size: 1.1rem;
+        }
+
+        #diplome {
+            display: none;
+            background: white;
+            color: black;
+            padding: 50px;
+            border: 15px double var(--gold);
+            text-align: center;
+        }
+
+        footer { text-align: center; padding: 50px; opacity: 0.4; }
+    </style>
+</head>
+<body>
+
+<div class="trophy-bar">
+    <span id="t1" class="t-icon">♟️</span>
+    <span id="t2" class="t-icon">♞</span>
+    <span id="t3" class="t-icon">♝</span>
+    <span id="t4" class="t-icon">♜</span>
+    <span id="t5" class="t-icon">👸</span>
+    <span id="t6" class="t-icon">👑</span>
+</div>
+
+<nav>
+    <button class="btn-nav" onclick="showPage('accueil')">🏠 ACCUEIL</button>
+    <button class="btn-nav" onclick="showPage('but')">🎯 BUT DU JEU</button>
+    <button class="btn-nav" onclick="showPage('pieces')">♟️ PIÈCES</button>
+    <button class="btn-nav" onclick="showPage('tactiques')">⚡ TACTIQUES</button>
+    <button class="btn-nav" onclick="showPage('quiz-page')">🧠 QUIZ (7 Q)</button>
+    <button class="btn-nav" onclick="showPage('honneur')">🏆 CLASSEMENT</button>
+</nav>
+
+<div class="container">
+
+    <div id="accueil" class="page active">
+        <h1 style="text-align: center; font-size: 4rem; color: var(--neon-blue);">ÉCHECS ♟️</h1>
+        <p style="text-align: center; font-size: 1.5rem;">Bienvenue dans l'arène des champions ! 🚀</p>
+        <div class="piece-card">
+            <h2>Ton défi : ✨</h2>
+            <p>1. Apprends le <strong>But du jeu</strong>.<br>2. Découvre les <strong>Mouvements</strong>.<br>3. Maîtrise les <strong>Tactiques</strong>.<br>4. Réussis le <strong>Quiz</strong> pour ton diplôme !</p>
+        </div>
+    </div>
+
+    <div id="but" class="page">
+        <h2 style="text-align: center; color: var(--gold);">🎯 QUEL EST LE BUT ?</h2>
+        <div class="piece-card">
+            <span class="big-emoji">🏁</span>
+            <h3>L'Échec et Mat !</h3>
+            <p>Le but du jeu est de capturer le <strong>Roi adverse</strong>. Quand le Roi est attaqué et qu'il ne peut plus s'échapper, on dit <strong>"Échec et Mat"</strong> ! 🎉</p>
+            <div class="move-box">
+                <strong>Attention :</strong> On ne "mange" jamais vraiment le Roi. Dès qu'il ne peut plus bouger, la partie s'arrête tout de suite ! 🛑
+            </div>
+        </div>
+    </div>
+
+    <div id="pieces" class="page">
+        <h2 style="text-align: center;">TES UNITÉS DE COMBAT ⚔️</h2>
+        <div class="piece-grid">
+            <div class="piece-card">
+                <span class="big-emoji">♟️</span>
+                <h3>LE PION</h3>
+                <span class="valeur">1 POINT</span>
+                <div class="move-box">Avance de 1 case ⬆️. Mange en diagonale ↗️.</div>
+            </div>
+            <div class="piece-card">
+                <span class="big-emoji">♞</span>
+                <h3>LE CAVALIER</h3>
+                <span class="valeur">3 POINTS</span>
+                <div class="move-box">Bouge en "L" ⤴️. Peut <strong>SAUTER</strong> par-dessus les autres !</div>
+            </div>
+            <div class="piece-card">
+                <span class="big-emoji">♝</span>
+                <h3>LE FOU</h3>
+                <span class="valeur">3 POINTS</span>
+                <div class="move-box">Bouge en diagonale ↗️ ↘️. Reste sur sa couleur !</div>
+            </div>
+            <div class="piece-card">
+                <span class="big-emoji">♜</span>
+                <h3>LA TOUR</h3>
+                <span class="valeur">5 POINTS</span>
+                <div class="move-box">Lignes droites ⬆️ ⬇️ ⬅️ ➡️. Très solide !</div>
+            </div>
+            <div class="piece-card">
+                <span class="big-emoji">👸</span>
+                <h3>LA REINE</h3>
+                <span class="valeur">9 POINTS</span>
+                <div class="move-box">Partout ! Lignes droites et diagonales. ⚡</div>
+            </div>
+            <div class="piece-card" style="border-color: var(--gold);">
+                <span class="big-emoji">👑</span>
+                <h3>LE ROI</h3>
+                <span class="valeur">INFINI</span>
+                <div class="move-box">1 seule case 🔲. Le chef à protéger ! 💀</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tactiques" class="page">
+        <h2 style="text-align: center; color: var(--neon-pink);">⚡ SECRETS TACTIQUES</h2>
+        <div class="piece-grid">
+            <div class="piece-card">
+                <span class="big-emoji">🍴</span>
+                <h3>LA FOURCHETTE</h3>
+                <p>C'est quand une seule de tes pièces attaque <strong>deux pièces adverses</strong> en même temps !</p>
+                <div class="move-box">Le Cavalier est le roi des fourchettes ! 🐎</div>
+            </div>
+            <div class="piece-card">
+                <span class="big-emoji">📌</span>
+                <h3>LE CLOUAGE</h3>
+                <p>Tu bloques une pièce ennemie : si elle bouge, une pièce plus importante (comme le Roi) derrière elle sera mangée !</p>
+                <div class="move-box">On dit que la pièce est "clouée" au plateau. 📍</div>
+            </div>
+            <div class="piece-card">
+                <span class="big-emoji">🍢</span>
+                <h3>L'ENFILADE</h3>
+                <p>L'inverse du clouage : tu attaques une grosse pièce (la Reine), elle doit fuir, et tu manges celle qui est derrière !</p>
+                <div class="move-box">C'est comme faire un brochette de pièces ! 🍡</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="quiz-page" class="page">
+        <div id="quiz-container" class="quiz-container">
+            <h2 id="q-title">Chargement...</h2>
+            <div id="options-box"></div>
+            <p style="margin-top: 20px;">Question : <span id="q-idx">1</span> / 7</p>
+        </div>
+        <div id="diplome">
+            <h1>📜 CHAMPION D'ÉCHECS 📜</h1>
+            <p>Félicitations ! Tu connais parfaitement le but et les règles !</p>
+            <button class="btn-nav" style="color:black; border-color:black;" onclick="window.print()">🖨️ IMPRIMER</button>
+        </div>
+    </div>
+
+    <div id="honneur" class="page">
+        <h2>🏆 TABLEAU D'HONNEUR</h2>
+        <div class="piece-card">
+            <input type="text" id="nameInput" placeholder="Ton nom..." style="padding: 10px;">
+            <button class="btn-nav" onclick="addName()">S'INSCRIRE ✍️</button>
+            <ul id="rankList" style="list-style:none; padding:0; margin-top:20px; font-size:1.2rem;"></ul>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    const questions = [
+        { q: "Quel est le but final du jeu ? 🎯", a: ["Manger tous les pions", "Faire Échec et Mat", "Courir vite"], c: 1 },
+        { q: "Quelle pièce peut sauter par-dessus les autres ? 🐎", a: ["La Reine", "Le Cavalier", "La Tour"], c: 1 },
+        { q: "La Reine vaut combien de points ? 👸", a: ["1 pt", "5 pts", "9 pts"], c: 2 },
+        { q: "Le Fou se déplace comment ? 🎯", a: ["En diagonale", "Tout droit", "En L"], c: 0 },
+        { q: "Quelle pièce est la plus importante ? 👑", a: ["Le Pion", "La Reine", "Le Roi"], c: 2 },
+        { q: "Peut-on 'manger' le Roi adverse ? 🛑", a: ["Oui", "Non, on fait Mat", "Seulement le mardi"], c: 1 },
+        { q: "Comment le Pion mange-t-il les autres ? ♟️", a: ["Tout droit", "En diagonale", "En sautant"], c: 1 }
+    ];
+
+    let currentQ = 0;
+
+    function showPage(id) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        if(id === 'quiz-page') loadQuestion();
+    }
+
+    function loadQuestion() {
+        if(currentQ >= questions.length) {
+            document.getElementById('quiz-container').style.display = 'none';
+            document.getElementById('diplome').style.display = 'block';
+            return;
+        }
+        const qData = questions[currentQ];
+        document.getElementById('q-title').innerText = qData.q;
+        document.getElementById('q-idx').innerText = currentQ + 1;
+        const box = document.getElementById('options-box');
+        box.innerHTML = "";
+        qData.a.forEach((opt, i) => {
+            const b = document.createElement('button');
+            b.className = "answer-btn";
+            b.innerText = opt;
+            b.onclick = () => {
+                if(i === qData.c) {
+                    alert("Correct ! 🎉");
+                    if(currentQ < 6) document.getElementById('t' + (currentQ+1)).classList.add('unlocked');
+                    currentQ++; loadQuestion();
+                } else { alert("Essaie encore ! ❌"); }
+            };
+            box.appendChild(b);
+        });
+    }
+
+    function addName() {
+        const val = document.getElementById('nameInput').value;
+        if(val) {
+            const li = document.createElement('li');
+            li.innerText = "🏅 " + val;
+            document.getElementById('rankList').appendChild(li);
+            document.getElementById('nameInput').value = "";
+        }
+    }
+</script>
+
+<footer>
+    <p>© 2026 - crée par Malik Moundai et Jacob Gascon Credit: Mme Caroline !</p>
+</footer>
+
+</body>
+</html>
